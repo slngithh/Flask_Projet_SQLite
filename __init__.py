@@ -86,7 +86,126 @@ def authentification_user():
 
 
 
+#######
+@app.route('/ajouter_livre', methods=['GET', 'POST'])
+def ajouter_livre():
+    if request.method == 'POST':
+        titre = request.form['titre']
+        auteur = request.form['auteur']
+        annee_publication = request.form['annee_publication']
 
+        # Connexion à la base de données
+        conn = sqlite3.connect('bibliotheque.db')
+        cursor = conn.cursor()
+
+        # Insérer un nouveau livre dans la base de données
+        cursor.execute('INSERT INTO livres (titre, auteur, annee_publication) VALUES (?, ?, ?)', 
+                       (titre, auteur, annee_publication))
+        conn.commit()
+        conn.close()
+
+        return redirect('/liste_livres')
+    return render_template('ajouter_livre.html')
+
+@app.route('/supprimer_livre/<int:livre_id>', methods=['GET', 'POST'])
+def supprimer_livre(livre_id):
+    # Connexion à la base de données
+    conn = sqlite3.connect('bibliotheque.db')
+    cursor = conn.cursor()
+
+    # Supprimer un livre de la base de données
+    cursor.execute('DELETE FROM livres WHERE id = ?', (livre_id,))
+    conn.commit()
+    conn.close()
+
+    return redirect('/liste_livres')
+
+
+@app.route('/recherche_livre', methods=['GET', 'POST'])
+def recherche_livre():
+    if request.method == 'POST':
+        recherche = request.form['recherche']
+        
+        # Connexion à la base de données
+        conn = sqlite3.connect('bibliotheque.db')
+        cursor = conn.cursor()
+
+        # Rechercher un livre par titre ou auteur
+        cursor.execute('SELECT * FROM livres WHERE titre LIKE ? OR auteur LIKE ?', 
+                       ('%' + recherche + '%', '%' + recherche + '%'))
+        livres = cursor.fetchall()
+        conn.close()
+
+        return render_template('recherche_livre.html', livres=livres)
+    return render_template('recherche_livre.html')
+
+@app.route('/emprunter_livre/<int:livre_id>', methods=['GET', 'POST'])
+def emprunter_livre(livre_id):
+    if not est_authentifie_user():
+        return redirect(url_for('authentification_user'))
+
+    # Connexion à la base de données
+    conn = sqlite3.connect('bibliotheque.db')
+    cursor = conn.cursor()
+
+    # Vérifier si le livre est déjà emprunté
+    cursor.execute('SELECT * FROM emprunts WHERE livre_id = ? AND retour IS NULL', (livre_id,))
+    emprunt_exist = cursor.fetchone()
+
+    if emprunt_exist:
+        return render_template('erreur_emprunt.html', message="Ce livre est déjà emprunté.")
+
+    # Enregistrer l'emprunt dans la base de données
+    cursor.execute('INSERT INTO emprunts (livre_id, utilisateur_id, date_emprunt) VALUES (?, ?, ?)', 
+                   (livre_id, session['utilisateur_id'], datetime.now()))
+    conn.commit()
+    conn.close()
+
+    return redirect('/liste_livres')
+
+@app.route('/inscription_utilisateur', methods=['GET', 'POST'])
+def inscription_utilisateur():
+    if request.method == 'POST':
+        nom = request.form['nom']
+        email = request.form['email']
+        mot_de_passe = request.form['mot_de_passe']
+        
+        # Connexion à la base de données
+        conn = sqlite3.connect('bibliotheque.db')
+        cursor = conn.cursor()
+
+        # Ajouter un nouvel utilisateur
+        cursor.execute('INSERT INTO utilisateurs (nom, email, mot_de_passe) VALUES (?, ?, ?)', 
+                       (nom, email, mot_de_passe))
+        conn.commit()
+        conn.close()
+
+        return redirect('/connexion_utilisateur')
+    return render_template('inscription_utilisateur.html')
+
+# Lors de l'ajout d'un livre
+cursor.execute('INSERT INTO livres (titre, auteur, annee_publication, stock) VALUES (?, ?, ?, ?)', 
+               (titre, auteur, annee_publication, stock))
+
+# Lors de l'emprunt
+cursor.execute('UPDATE livres SET stock = stock - 1 WHERE id = ?', (livre_id,))
+
+# Lors du retour d'un livre
+cursor.execute('UPDATE livres SET stock = stock + 1 WHERE id = ?', (livre_id,))
+
+
+# Vérification du rôle utilisateur
+def est_admin():
+    return session.get('role') == 'admin'
+
+@app.route('/admin/ajouter_livre', methods=['GET', 'POST'])
+def ajouter_livre_admin():
+    if not est_admin():
+        return redirect(url_for('accueil'))
+
+    # Code pour ajouter un livre...
+
+#######
 
 @app.route('/authentification', methods=['GET', 'POST'])
 def authentification():
