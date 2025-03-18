@@ -17,15 +17,20 @@ def est_authentifie():
 def hello_world():
     return render_template('hello.html')
     
-@app.route('/lecture')
-def lecture():
-    if not est_authentifie():
+#@app.route('/lecture')
+#def lecture():
+    #if not est_authentifie():
         # Rediriger vers la page d'authentification si l'utilisateur n'est pas authentifié
-        return redirect(url_for('authentification'))
+        #return redirect(url_for('authentification'))
 
   # Si l'utilisateur est authentifié
-    return "<h2>Bravo, vous êtes authentifié</h2>"
+    #return "<h2>Bravo, vous êtes authentifié</h2>"
 
+# Retirer la vérification de l'authentification administrateur
+@app.route('/lecture')
+def lecture():
+    # Supprimer la vérification de l'authentification
+    return "<h2>Bienvenue, vous pouvez accéder à cette page sans authentification.</h2>"
 
 # Fonction d'authentification pour l'utilisateur "user"
 def est_authentifie_user():
