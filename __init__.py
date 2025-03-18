@@ -13,10 +13,6 @@ app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'  # Clé secrète pour les sessions
 def est_authentifie():
     return session.get('authentifie')
 
-# Fonction d'authentification pour l'utilisateur "user"
-def est_authentifie_user():
-    return session.get('authentifie_user')
-
 @app.route('/')
 def hello_world():
     return render_template('hello.html')
@@ -29,24 +25,6 @@ def lecture():
 
   # Si l'utilisateur est authentifié
     return "<h2>Bravo, vous êtes authentifié</h2>"
-
-#
-
-
-# Page de connexion pour l'utilisateur "user"
-@app.route('/authentification_user', methods=['GET', 'POST'])
-def authentification_user():
-    if request.method == 'POST':
-        # Vérifier les identifiants pour l'utilisateur "user"
-        if request.form['username'] == 'user' and request.form['password'] == '12345':
-            session['authentifie_user'] = True
-            # Rediriger vers la route de recherche après une authentification réussie
-            return redirect(url_for('recherche_par_nom'))
-        else:
-            # Afficher un message d'erreur si les identifiants sont incorrects
-            return render_template('formulaire_authentification.html', error=True)
-    
-    return render_template('formulaire_authentification.html', error=False)
 
 @app.route('/authentification', methods=['GET', 'POST'])
 def authentification():
@@ -99,31 +77,6 @@ def enregistrer_client():
     conn.commit()
     conn.close()
     return redirect('/consultation/')  # Rediriger vers la page d'accueil après l'enregistrement
-
-@app.route('/fiche_nom/', methods=['GET', 'POST'])
-def recherche_par_nom():
-    if request.method == 'POST':
-        # Récupérer le nom recherché depuis le formulaire
-        nom_recherche = request.form['nom']
-        
-        # Connexion à la base de données
-        conn = sqlite3.connect('database.db')
-        cursor = conn.cursor()
-        
-        # Recherche dans la base de données en fonction du nom
-        cursor.execute('SELECT * FROM clients WHERE nom LIKE ?', ('%' + nom_recherche + '%',))
-        data = cursor.fetchall()
-        conn.close()
-        
-        # Si des résultats sont trouvés
-        if data:
-            return render_template('read_data.html', data=data)
-        else:
-            # Si aucun résultat trouvé, afficher un message
-            return render_template('read_data.html', message="Aucun client trouvé avec ce nom.")
-    
-    # Si la méthode est GET, afficher le formulaire de recherche
-    return render_template('formulaire_recherche.html')
 
 if __name__ == "__main__":
   app.run(debug=True)
