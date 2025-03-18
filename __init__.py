@@ -13,13 +13,24 @@ app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'  # Clé secrète pour les sessions
 def est_authentifie():
     return session.get('authentifie')
 
-
 # Fonction d'authentification pour l'utilisateur "user"
 def est_authentifie_user():
     return session.get('authentifie_user')
 
+@app.route('/')
+def hello_world():
+    return render_template('hello.html')
+    
+@app.route('/lecture')
+def lecture():
+    if not est_authentifie():
+        # Rediriger vers la page d'authentification si l'utilisateur n'est pas authentifié
+        return redirect(url_for('authentification'))
 
+  # Si l'utilisateur est authentifié
+    return "<h2>Bravo, vous êtes authentifié</h2>"
 
+#
 @app.route('/fiche_nom/', methods=['GET', 'POST'])
 def recherche_par_nom():
     if not est_authentifie_user():
@@ -48,7 +59,7 @@ def recherche_par_nom():
     
     # Si la méthode est GET, afficher le formulaire de recherche
     return render_template('formulaire.html')
-
+#
 
 # Page de connexion pour l'utilisateur "user"
 @app.route('/authentification_user', methods=['GET', 'POST'])
@@ -64,22 +75,6 @@ def authentification_user():
             return render_template('formulaire_authentification.html', error=True)
     
     return render_template('formulaire_authentification.html', error=False)
-
-
-
-
-@app.route('/')
-def hello_world():
-    return render_template('hello.html')
-    
-@app.route('/lecture')
-def lecture():
-    if not est_authentifie():
-        # Rediriger vers la page d'authentification si l'utilisateur n'est pas authentifié
-        return redirect(url_for('authentification'))
-
-  # Si l'utilisateur est authentifié
-    return "<h2>Bravo, vous êtes authentifié</h2>"
 
 @app.route('/authentification', methods=['GET', 'POST'])
 def authentification():
