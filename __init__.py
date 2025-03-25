@@ -165,8 +165,7 @@ def emprunter_livre(id_livre):
         message = "Désolé, ce livre n'est pas disponible."
 
     conn.close()
-    return redirect('/consultation_livres')  # Rediriger vers la liste des livres avec un message
-
+    return redirect(url_for('consultation_livres', message=message))  # Passer le message à la page de consultation
 
                                                                                                                                        
 if __name__ == "__main__":
