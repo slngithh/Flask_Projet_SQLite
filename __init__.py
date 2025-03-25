@@ -49,6 +49,22 @@ def Readfiche(post_id):
     # Rendre le template HTML et transmettre les données
     return render_template('read_data.html', data=data)
 
+@app.route('/fiche_nom/', methods=['GET', 'POST'])
+def search_by_name():
+    data = []
+    if request.method == 'POST':
+        search_term = request.form['search_term']
+        # Connexion à la base de données
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        # Requête SQL pour une recherche partielle
+        cursor.execute('SELECT * FROM clients WHERE nom LIKE ?', (f'%{search_term}%',))
+        data = cursor.fetchall()
+        conn.close()
+    # Rendre le template HTML et transmettre les données
+    return render_template('read_data.html', data=data)
+
+
 @app.route('/consultation/')
 def ReadBDD():
     conn = sqlite3.connect('database.db')
