@@ -6,6 +6,11 @@
 </head>
 <body>
     <h1>Liste des Livres</h1>
+    
+    {% if message %}
+        <p>{{ message }}</p>
+    {% endif %}
+
     <table>
         <tr>
             <th>ID</th>
@@ -13,7 +18,7 @@
             <th>Auteur</th>
             <th>Année de Publication</th>
             <th>Quantité</th>
-            <th>Action</th>
+            <th>Actions</th>
         </tr>
         {% for row in data %}
         <tr>
@@ -22,7 +27,18 @@
             <td>{{ row[2] }}</td>
             <td>{{ row[3] }}</td>
             <td>{{ row[4] }}</td>
-            <td><a href="{{ url_for('supprimer_livre', id_livre=row[0]) }}">Supprimer</a></td>
+            <td>
+                {% if row[4] > 0 %}
+                    <!-- Option pour emprunter -->
+                    <a href="{{ url_for('emprunter_livre', id_livre=row[0]) }}">Emprunter</a>
+                {% else %}
+                    <!-- Message d'indisponibilité -->
+                    <span>Indisponible</span>
+                {% endif %}
+                | 
+                <!-- Option pour supprimer -->
+                <a href="{{ url_for('supprimer_livre', id_livre=row[0]) }}">Supprimer</a>
+            </td>
         </tr>
         {% endfor %}
     </table>
