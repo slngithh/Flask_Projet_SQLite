@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajouter un Livre</title>
+</head>
+<body>
+    <h1>Ajouter un Livre</h1>
+    <form action="/ajouter_livre" method="POST">
+        <label for="titre">Titre :</label>
+        <input type="text" id="titre" name="titre" required><br>
+
+        <label for="auteur">Auteur :</label>
+        <input type="text" id="auteur" name="auteur" required><br>
+
+        <label for="annee_publication">Année de Publication :</label>
+        <input type="number" id="annee_publication" name="annee_publication" required><br>
+
+        <label for="quantite">Quantité :</label>
+        <input type="number" id="quantite" name="quantite" required><br>
+
+        <button type="submit">Ajouter</button>
+    </form>
+</body>
+</html>
