@@ -92,6 +92,45 @@ def enregistrer_client():
     conn.commit()
     conn.close()
     return redirect('/consultation/')  # Rediriger vers la page d'accueil après l'enregistrement
+
+# Ajouter un livre
+@app.route('/ajouter_livre', methods=['GET', 'POST'])
+def ajouter_livre():
+    if request.method == 'POST':
+        titre = request.form['titre']
+        auteur = request.form['auteur']
+        annee_publication = request.form['annee_publication']
+        quantite = request.form['quantite']
+
+        # Connexion à la base de données des livres
+        conn = sqlite3.connect('database2.db')
+        cursor = conn.cursor()
+
+        # Requête SQL pour insérer un livre
+        cursor.execute('INSERT INTO Livres (Titre, Auteur, Annee_publication, Quantite) VALUES (?, ?, ?, ?)', 
+                       (titre, auteur, annee_publication, quantite))
+        conn.commit()
+        conn.close()
+
+        return redirect('/consultation_livres')  # Rediriger vers la liste des livres après l'ajout
+
+    return render_template('ajouter_livre.html')  # Afficher le formulaire d'ajout
+
+# Supprimer un livre
+@app.route('/supprimer_livre/<int:id_livre>', methods=['GET', 'POST'])
+def supprimer_livre(id_livre):
+    # Connexion à la base de données des livres
+    conn = sqlite3.connect('database2.db')
+    cursor = conn.cursor()
+
+    # Requête SQL pour supprimer un livre par ID
+    cursor.execute('DELETE FROM Livres WHERE ID_livre = ?', (id_livre,))
+    conn.commit()
+    conn.close()
+
+    return redirect('/consultation_livres')  # Rediriger vers la liste des livres après la suppression
+
+
                                                                                                                                        
 if __name__ == "__main__":
   app.run(debug=True)
