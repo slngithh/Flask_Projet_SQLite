@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Livres</title>
+</head>
+<body>
+    <h1>Liste des Livres</h1>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Titre</th>
+            <th>Auteur</th>
+            <th>Année de Publication</th>
+            <th>Quantité</th>
+            <th>Action</th>
+        </tr>
+        {% for row in data %}
+        <tr>
+            <td>{{ row[0] }}</td>
+            <td>{{ row[1] }}</td>
+            <td>{{ row[2] }}</td>
+            <td>{{ row[3] }}</td>
+            <td>{{ row[4] }}</td>
+            <td><a href="{{ url_for('supprimer_livre', id_livre=row[0]) }}">Supprimer</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
