@@ -130,6 +130,43 @@ def supprimer_livre(id_livre):
 
     return redirect('/consultation_livres')  # Rediriger vers la liste des livres après la suppression
 
+# Route pour consulter la liste des livres
+@app.route('/consultation_livres')
+def consultation_livres():
+    # Connexion à la base de données des livres
+    conn = sqlite3.connect('database2.db')
+    cursor = conn.cursor()
+
+    # Requête SQL pour récupérer tous les livres
+    cursor.execute('SELECT * FROM Livres')
+    data = cursor.fetchall()
+    conn.close()
+
+    # Rendre le template HTML et transmettre les données
+    return render_template('consultation_livres.html', data=data)
+
+# Emprunter un livre
+@app.route('/emprunter_livre/<int:id_livre>', methods=['GET', 'POST'])
+def emprunter_livre(id_livre):
+    # Connexion à la base de données des livres
+    conn = sqlite3.connect('database2.db')
+    cursor = conn.cursor()
+
+    # Vérifier le stock avant d'emprunter
+    cursor.execute('SELECT Quantite FROM Livres WHERE ID_livre = ?', (id_livre,))
+    quantite = cursor.fetchone()[0]
+
+    if quantite > 0:
+        # Mettre à jour le stock (réduire la quantité de 1)
+        cursor.execute('UPDATE Livres SET Quantite = Quantite - 1 WHERE ID_livre = ?', (id_livre,))
+        conn.commit()
+        message = "Emprunt réussi !"
+    else:
+        message = "Désolé, ce livre n'est pas disponible."
+
+    conn.close()
+    return redirect('/consultation_livres')  # Rediriger vers la liste des livres avec un message
+
 
                                                                                                                                        
 if __name__ == "__main__":
