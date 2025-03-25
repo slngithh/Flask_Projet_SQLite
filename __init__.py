@@ -1,6 +1,7 @@
 from flask import Flask, render_template_string, render_template, jsonify, request, redirect, url_for, session
 from flask import render_template
 from flask import json
+from flask import flash
 from urllib.request import urlopen
 from werkzeug.utils import secure_filename
 import sqlite3
@@ -29,15 +30,15 @@ def lecture():
 def authentification():
     if request.method == 'POST':
         # Vérifier les identifiants
-        if request.form['username'] == 'admin' and request.form['password'] == 'password': # password à cacher par la suite
+        if request.form['username'] == 'admin' and request.form['password'] == 'password':  # à ne pas laisser en clair
             session['authentifie'] = True
-            # Rediriger vers la route lecture après une authentification réussie
+            flash('Authentification réussie!', 'success')  # Message de succès
             return redirect(url_for('lecture'))
         else:
-            # Afficher un message d'erreur si les identifiants sont incorrects
-            return render_template('formulaire_authentification.html', error=True)
+            flash('Nom d\'utilisateur ou mot de passe incorrect', 'error')  # Message d'erreur
+            return render_template('formulaire_authentification.html')
 
-    return render_template('formulaire_authentification.html', error=False)
+    return render_template('formulaire_authentification.html')
 
 @app.route('/fiche_client/<int:post_id>')
 def Readfiche(post_id):
